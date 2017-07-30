@@ -1,6 +1,6 @@
 # Ns3
 ## 安裝教學（）
-！[install]（/install/install.pptx/）
+！[install]（https://github.com/Lu-Yi-Hsun/Ns3/tree/master/install/LTE模擬器-NS3之簡介,環境設置與模擬範例.pptx）
 ## 使用教學
 1.把想要模擬的檔案放入ns3的scratch
 2.在scratch往上一層目錄開啟終端機
