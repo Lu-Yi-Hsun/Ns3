@@ -1,6 +1,6 @@
 # Ns3
 ## 安裝教學（）
-！[install]（install/install.pptx）
+！[install]（/install/install.pptx/）
 ## 使用教學
 1.把想要模擬的檔案放入ns3的scratch
 2.在scratch往上一層目錄開啟終端機
