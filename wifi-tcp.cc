@@ -63,6 +63,9 @@ double distance = 50.0;
 
 double speed_x=10;
 
+
+
+//處理顯示Throughput
 void
 CalculateThroughput ()
 {
@@ -102,6 +105,9 @@ std::string s;
 
  
 /*處理顯示位置與速度*/
+
+//只能顯示隨機路線的位置與速度
+//固定位置與速度部份能直接換算
 static void 
 CourseChange (std::string foo, Ptr<const MobilityModel> mobility)
 {
@@ -153,7 +159,7 @@ int wifi(int argc, char *argv[]){
   wifiChannel.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
   wifiChannel.AddPropagationLoss ("ns3::FriisPropagationLossModel", "Frequency", DoubleValue (5e9));
 
-  /* Setup Physical Layer */
+  /* wifi硬體設定Setup Physical Layer */
   YansWifiPhyHelper wifiPhy = YansWifiPhyHelper::Default ();
   wifiPhy.SetChannel (wifiChannel.Create ());
   wifiPhy.Set ("TxPowerStart", DoubleValue (10.0));
@@ -216,6 +222,7 @@ mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");
 
 
 
+//設定使用者的wifi
 
 
  MobilityHelper mobility;
@@ -230,13 +237,16 @@ mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");
 
   
  //apWifiNode->GetObject<MobilityModel> ()->SetPosition (Vector (222, 222, 0));
+
+ //這裡設定固定速度 行走向量 Vector (speed_x, 0, 0) (速度,x向量,y向量)
   staWifiNode->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (speed_x, 0, 0));
 
 
 
 
 
-//走隨機路線
+//底下功能 能走隨機路線 但我設定速度0讓它靜止
+//wifi ap
 
   MobilityHelper mobility2;
 
@@ -330,16 +340,28 @@ return 0;
 int
 main(int argc, char *argv[])
 {
-//設定每一個封包多大
-payloadSize = 1024;                       /* Transport layer payload size in bytes. */
-//設定多少個封包 注意封包設定太大會有模擬器跑完卻還沒送完問題所以要再增大模擬器時間
-int package=50;
-MaxBytes= payloadSize*package;
-//設定datarate
-dataRate = "1000Mbps";  
+
+//控制的變數參考 
+
+  //設定每一個封包多大
+  payloadSize = 1024;                       /* Transport layer payload size in bytes. */
+  //設定多少個封包 注意封包設定太大會有模擬器跑完卻還沒送完問題所以要再增大模擬器時間
+  int package=50;
+  MaxBytes= payloadSize*package;
+  //設定datarate
+  dataRate = "1000Mbps";  
+/******************************************************************/
+
+
+
+
 
 //輸出的格式 
 std::cout<<"DataRate(Mbps) AverageThroughput(Mbit/s) Delay(sec) ALLDATA(Bytes) deviation-sec（s）\n";
+
+
+
+
 
 
 speed_x=110;
