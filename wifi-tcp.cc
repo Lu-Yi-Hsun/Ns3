@@ -1,36 +1,9 @@
 /* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2015, IMDEA Networks Institute
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation;
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * Author: Hany Assasa <hany.assasa@gmail.com>
-.*
- * This is a simple example to test TCP over 802.11n (with MPDU aggregation enabled).
- *
- * Network topology:
- *
- *   Ap    STA
- *   *      *
- *   |      |
- *   n1     n2
- *
- * In this example, an HT station sends TCP packets to the access point. 
- * We report the total throughput received during a window of 100ms. 
- * The user can specify the application data rate and choose the variant
- * of TCP i.e. congestion control algorithm to use.
- */
+  
+  n*node-------ap------sta(直線移動)
+ 
+*/
 
 #include "ns3/applications-module.h"
 #include "ns3/core-module.h"
@@ -42,7 +15,7 @@
 #include "ns3/netanim-module.h"
 #include <math.h>
 
-
+#define PI 3.14159265
 
  
 #include "ns3/config-store-module.h"
@@ -54,16 +27,18 @@ using namespace ns3;
 Ptr<PacketSink> sink;                         /* Pointer to the packet sink application */
 uint64_t lastTotalRx = 0;                     /* The value of the last total received bytes */
 
-
+double angle_ans;
 
 uint32_t payloadSize;                       /* Transport layer payload size in bytes. */
 uint64_t MaxBytes;
  
+double ap_po_x;
 
+double ap_po_y;
 std::string ans_dataRate;
-double ans_averageThroughput;
-double ans_delay;
-int ans_allbytes;
+double ans_averageThroughput=0;
+double ans_delay=0;
+int ans_allbytes=0;
 
 //double distance = 50.0;
 //設定 datarate
@@ -81,6 +56,8 @@ int other_node=1;
 void
 CalculateThroughput ()
 {
+
+  
   Time now = Simulator::Now ();                                         /* Return the simulator's virtual time. */
 double cur = (sink->GetTotalRx() - lastTotalRx) * (double) 8/1e5;     /* Convert Application RX Packets to MBits. */
 // std::cout << now.GetSeconds () << "s: \t" << cur << " Mbit/s" << std::endl;
@@ -139,7 +116,10 @@ CourseChange (std::string foo, Ptr<const MobilityModel> mobility)
 
 
 
-int wifi(int argc, char *argv[]){
+void wifi(int argc, char *argv[]){
+
+ 
+
 
 std::string animFile = "my_wifi.xml" ; 
 
@@ -148,8 +128,8 @@ std::string animFile = "my_wifi.xml" ;
   
   //http://mcsindex.com/
   std::string phyRate = "HtMcs1";                    /* Physical layer bitrate. */
-  double simulationTime = 100;                        /* Simulation time in seconds. */
-  bool pcapTracing = false;                          /* PCAP Tracing is enabled or not. */
+  double simulationTime = 10;                        /* Simulation time in seconds. */
+ // bool pcapTracing = false;                          /* PCAP Tracing is enabled or not. */
 
   /* Command line argument parser setup. */
   CommandLine cmd;
@@ -158,7 +138,7 @@ std::string animFile = "my_wifi.xml" ;
   cmd.AddValue ("tcpVariant", "Transport protocol to use: TcpTahoe, TcpReno, TcpNewReno, TcpWestwood, TcpWestwoodPlus ", tcpVariant);
   cmd.AddValue ("phyRate", "Physical layer bitrate", phyRate);
   cmd.AddValue ("simulationTime", "Simulation time in seconds", simulationTime);
-  cmd.AddValue ("pcap", "Enable/disable PCAP Tracing", pcapTracing);
+ // cmd.AddValue ("pcap", "Enable/disable PCAP Tracing", pcapTracing);
   cmd.Parse (argc, argv);
 
   /* No fragmentation and no RTS/CTS */
@@ -248,17 +228,30 @@ mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");
 */
 
 
-
+ /*隨機
+  mobility2.SetPositionAllocator ("ns3::RandomDiscPositionAllocator",
+                                  "X", StringValue ("7.5"),
+                                  "Y", StringValue ("7.5"),
+                                  "Rho", StringValue ("ns3::UniformRandomVariable[Min=0|Max=30]"));
+  
+  mobility2.SetMobilityModel ("ns3::RandomWalk2dMobilityModel",
+                              "Mode", StringValue ("Time"),
+                              "Time", StringValue ("1s"),
+                              "Speed", StringValue ("ns3::ConstantRandomVariable[Constant=0.0]"),
+                              "Bounds", StringValue ("0|200|0|200"));*/
 
 //設定使用者的wifi
 
 
  MobilityHelper mobility;
 
-  mobility.SetPositionAllocator ("ns3::RandomDiscPositionAllocator",
-                                  "X", StringValue ("100.0"),
-                                  "Y", StringValue ("100.0"),
-                                  "Rho", StringValue ("ns3::UniformRandomVariable[Min=0|Max=30]"));
+ mobility.SetPositionAllocator ("ns3::GridPositionAllocator",
+                                 "MinX", DoubleValue (0),
+                                 "MinY", DoubleValue (0),
+                                 "DeltaX", DoubleValue (5.0),
+                                 "DeltaY", DoubleValue (10.0),
+                                 "GridWidth", UintegerValue (3),
+                                 "LayoutType", StringValue ("RowFirst"));
  mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");
 
  mobility.Install (staWifiNode);
@@ -278,15 +271,16 @@ mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");
 
   MobilityHelper mobility2;
 
-  mobility2.SetPositionAllocator ("ns3::RandomDiscPositionAllocator",
-                                  "X", StringValue ("100.0"),
-                                  "Y", StringValue ("100.0"),
-                                  "Rho", StringValue ("ns3::UniformRandomVariable[Min=0|Max=30]"));
-  mobility2.SetMobilityModel ("ns3::RandomWalk2dMobilityModel",
-                              "Mode", StringValue ("Time"),
-                              "Time", StringValue ("1s"),
-                              "Speed", StringValue ("ns3::ConstantRandomVariable[Constant=0.0]"),
-                              "Bounds", StringValue ("0|200|0|200"));
+
+ mobility2.SetPositionAllocator ("ns3::GridPositionAllocator",
+                                 "MinX", DoubleValue (ap_po_x),
+                                 "MinY", DoubleValue (ap_po_y),
+                                 "DeltaX", DoubleValue (5.0),
+                                 "DeltaY", DoubleValue (10.0),
+                                 "GridWidth", UintegerValue (3),
+                                 "LayoutType", StringValue ("RowFirst"));
+
+  mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 
   mobility2.Install (apWifiNode);
 
@@ -295,17 +289,18 @@ mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");
 
 //other_ue
 //
+ 
  MobilityHelper mobility3;
 
   mobility3.SetPositionAllocator ("ns3::RandomDiscPositionAllocator",
-                                  "X", StringValue ("100.0"),
-                                  "Y", StringValue ("100.0"),
+                                  "X", StringValue (std::to_string(ap_po_x)),
+                                  "Y", StringValue (std::to_string(ap_po_x)),
                                   "Rho", StringValue ("ns3::UniformRandomVariable[Min=0|Max=30]"));
-  mobility3.SetMobilityModel ("ns3::RandomWalk2dMobilityModel",
+ /* mobility3.SetMobilityModel ("ns3::RandomWalk2dMobilityModel",
                               "Mode", StringValue ("Time"),
                               "Time", StringValue ("1s"),
                               "Speed", StringValue ("ns3::ConstantRandomVariable[Constant=0.0]"),
-                              "Bounds", StringValue ("0|200|0|200"));
+                              "Bounds", StringValue ("0|200|0|200"));*/
 
   mobility3.Install (other_ue);
 
@@ -385,33 +380,31 @@ mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");
 
   /* Enable Traces */
   
-      wifiPhy.SetPcapDataLinkType (YansWifiPhyHelper::DLT_IEEE802_11_RADIO);
-      wifiPhy.EnablePcap ("AccessPoint", apDevice);
-      wifiPhy.EnablePcap ("Station", staDevices);
+     // wifiPhy.SetPcapDataLinkType (YansWifiPhyHelper::DLT_IEEE802_11_RADIO);
+     // wifiPhy.EnablePcap ("AccessPoint", apDevice);
+      //wifiPhy.EnablePcap ("Station", staDevices);
    
    
 
 
 Config::Connect ("/NodeList/*/$ns3::MobilityModel/CourseChange",
                    MakeCallback (&CourseChange));
-
+/*啟動追蹤檔案 可以用netanim開啟
  AnimationInterface anim (animFile);
   anim.EnablePacketMetadata (); // Optional
   anim.EnableIpv4L3ProtocolCounters (Seconds (0), Seconds (10)); // Optional
-  
-
-
-
+  anim.SetMaxPktsPerTraceFile(999999999);
+*/
   /* Start Simulation */
   Simulator::Stop (Seconds (simulationTime + 1));
   Simulator::Run ();
  Simulator::Destroy ();
   
-std::cout <<ans_dataRate<<" "<<ans_averageThroughput<<" "<<ans_delay<<" "<<ans_allbytes<<" "<<MaxBytes<<" "<<(double)ans_delay-(double)ans_allbytes*8/std::stod(ans_dataRate)/1024/1024<<std::endl;
+std::cout <<ans_dataRate<<" "<<ans_averageThroughput<<" "<<ans_delay<<" "<<ans_allbytes<<" "<<MaxBytes<<" "<<(double)ans_delay-(double)ans_allbytes*8/std::stod(ans_dataRate)/1024/1024<<" "<<angle_ans<<" "<<other_node<<" "<<rss<<" "<<speed_x<<" "<<speed_y<<std::endl;
 
 //std::cout <<"*************************************"<<std::endl;
 
-return 0;
+
 }
 
 
@@ -424,66 +417,79 @@ main(int argc, char *argv[])
 
 //控制的變數參考 
   //設定訊號強度
-    rss = -98; 
+    rss = 100; //屬於設定全部wifi的訊號 設定太小會無法執行因為訊號太小 接收不到   主要應影響可以傳輸的範圍 訊號設定超級高 傳輸距離能操過wifi的 100m
   //控制要測量的ue的速度向量
-    speed_x=10;
-    speed_y=0;
+    speed_x=0;
+    speed_y=11;
   //有多少 其他人也在使用這個wifiap
-    other_node=1;
+    other_node=2;
   //設定每一個封包多大
     payloadSize = 1024;                       /* Transport layer payload size in bytes. */
   //設定多少個封包 注意封包設定太大會有模擬器跑完卻還沒送完問題所以要再增大模擬器時間
     int package=100;
     MaxBytes= payloadSize*package;
-  //設定datarate
-    dataRate = "54Mbps";  
+  //設定datarate (所有node包含ue的連接點datarate)
+    dataRate = "54Mbps"; 
+  //設定ap的位置
+  
 /******************************************************************/
-
-
-
+  /*計算移動角度跟up-ap角度 的夾角*/
+  //移動方向的角度
+  int angle;
+      angle = atan (speed_y/speed_x)*180/PI;
+      
+  //ap位置的角度
+  int param;
+    param = 90.0;
+    //距離
+    int range=10;
+   angle_ans=angle-param;
+   //設定ap位置 以ue為中心
+   ap_po_x=range*cos ( param * PI / 180.0 );
+  ap_po_y=range*sin ( param * PI / 180.0 );
+  //方向角度減去ap位置角度
 
 
 //輸出的格式 
-std::cout<<"DataRate(Mbps) AverageThroughput(Mbit/s) Delay(sec) APgetDATA(Bytes) MaxBytes deviation-sec（s）\n";
+std::cout<<"DataRate(Mbps) AverageThroughput(Mbit/s) Delay(sec) APgetDATA(Bytes) MaxBytes deviation-sec(s) angle(角度夾角) other_node（此ap有多少其他連線）rss(dbm) ue-x方向速度(m/s) ue-y方向速度(m/s)\n";
 
+//底下是我藉由上面參數做的實驗 實驗室 隨機ue速度向量 隨機other_node 隨機rss 隨機datarate 隨機 ap位置所產生的數據
+//亂數
+unsigned seed;
+seed = (unsigned)time(NULL); // 取得時間序列
 
-speed_x=1;
+srand(seed);
+
+ for (int i=0;i<100;i++){
+speed_x=rand()%20;
+speed_y=rand()%20;
+
+other_node=rand()%100;
+range=rand()%90+10;
+param=rand()%360;
+rss=-1*rand()%60;
+int temp=rand()%100+10;
+dataRate = int2str(temp)+"Mbps";
+  angle_ans=angle-param;
+
+ap_po_x=range*cos ( param * PI / 180.0 );
+ap_po_y=range*sin ( param * PI / 180.0 );
+
 wifi(argc,argv);
+
+
+ }
+
+ 
+
 
 return 0;
 
 
-for(int sp=100;sp<300;sp++){
-  speed_x=sp;
-std::cout<<sp<<std::endl;
-
-wifi(argc,argv);
-
-}
-
-
-return 0;
 
 
 
 
-
-
-
-
-for(int change=1;change<50;change++){
-int bit=1;
-  for(int j=1;j<=change;j++){
-    bit=1*bit+1;
-
-  }
-  dataRate = int2str(bit)+"Mbps";
-
-wifi(argc,argv);
-
-}
-
-
-  return 0;
+ 
 
 }
