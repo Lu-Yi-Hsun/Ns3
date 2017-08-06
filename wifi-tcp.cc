@@ -127,7 +127,7 @@ std::string animFile = "my_wifi.xml" ;
   std::string tcpVariant = "ns3::TcpNewReno";        /* TCP variant type. */
   
   //http://mcsindex.com/
-  std::string phyRate = "HtMcs1";                    /* Physical layer bitrate. */
+  std::string phyRate = "VhtMcs9";                    /* Physical layer bitrate. */
   double simulationTime = 10;                        /* Simulation time in seconds. */
  // bool pcapTracing = false;                          /* PCAP Tracing is enabled or not. */
 
@@ -140,7 +140,7 @@ std::string animFile = "my_wifi.xml" ;
   cmd.AddValue ("simulationTime", "Simulation time in seconds", simulationTime);
  // cmd.AddValue ("pcap", "Enable/disable PCAP Tracing", pcapTracing);
   cmd.Parse (argc, argv);
-
+Config::Set("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/ChannelWidth", UintegerValue (20));
   /* No fragmentation and no RTS/CTS */
   Config::SetDefault ("ns3::WifiRemoteStationManager::FragmentationThreshold", StringValue ("999999"));
   Config::SetDefault ("ns3::WifiRemoteStationManager::RtsCtsThreshold", StringValue ("999999"));
@@ -148,9 +148,16 @@ std::string animFile = "my_wifi.xml" ;
   /* Configure TCP Options */
   Config::SetDefault ("ns3::TcpSocket::SegmentSize", UintegerValue (payloadSize));
 
+
+  
   WifiMacHelper wifiMac;
   WifiHelper wifiHelper;
-  wifiHelper.SetStandard (WIFI_PHY_STANDARD_80211n_5GHZ);
+
+  //設定給80211n用
+  //wifiHelper.SetStandard (WIFI_PHY_STANDARD_80211n_5GHZ);
+
+ // 設定給80211ac用
+wifiHelper.SetStandard (WIFI_PHY_STANDARD_80211ac);
 
   /* Set up Legacy Channel */
   YansWifiChannelHelper wifiChannel ;
@@ -169,11 +176,10 @@ std::string animFile = "my_wifi.xml" ;
   wifiPhy.Set ("CcaMode1Threshold", DoubleValue (-79));
   wifiPhy.Set ("EnergyDetectionThreshold", DoubleValue (-79 + 3));
   wifiPhy.SetErrorRateModel ("ns3::YansErrorRateModel");
-  wifiHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager",
-                                      "DataMode", StringValue (phyRate),
-                                      "ControlMode", StringValue ("HtMcs0"));
-
-
+  //for wifi 設定給80211n用
+  //wifiHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue (phyRate),"ControlMode", StringValue ("VhtMcs9"));
+  //for wifi 設定給80211ac用
+  wifiHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager", "DataMode", StringValue("VhtMcs9"), "ControlMode", StringValue("VhtMcs0"));
 
 /*產生節點*/
   NodeContainer networkNodes;
