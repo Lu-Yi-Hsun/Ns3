@@ -140,7 +140,7 @@ std::string animFile = "my_wifi.xml" ;
   cmd.AddValue ("simulationTime", "Simulation time in seconds", simulationTime);
  // cmd.AddValue ("pcap", "Enable/disable PCAP Tracing", pcapTracing);
   cmd.Parse (argc, argv);
-Config::Set("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/ChannelWidth", UintegerValue (20));
+//Config::Set("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/ChannelWidth", UintegerValue (20));
   /* No fragmentation and no RTS/CTS */
   Config::SetDefault ("ns3::WifiRemoteStationManager::FragmentationThreshold", StringValue ("999999"));
   Config::SetDefault ("ns3::WifiRemoteStationManager::RtsCtsThreshold", StringValue ("999999"));
@@ -152,13 +152,19 @@ Config::Set("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/ChannelWidth", Uin
   
   WifiMacHelper wifiMac;
   WifiHelper wifiHelper;
+//底下設定wifi版本 80211ac 80211n
+
+
 
   //設定給80211n用
   //wifiHelper.SetStandard (WIFI_PHY_STANDARD_80211n_5GHZ);
 
  // 設定給80211ac用
-wifiHelper.SetStandard (WIFI_PHY_STANDARD_80211ac);
+//wifiHelper.SetStandard (WIFI_PHY_STANDARD_80211ac);
+//!80211ax!!!!!!
+wifiHelper.SetStandard(WIFI_PHY_STANDARD_80211ax_5GHZ);
 
+  
   /* Set up Legacy Channel */
   YansWifiChannelHelper wifiChannel ;
   wifiChannel.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
@@ -222,7 +228,7 @@ NetDeviceContainer otherDevices;
 
 
 /*
-    
+    直線
  MobilityHelper mobility;
  mobility.SetPositionAllocator ("ns3::RandomDiscPositionAllocator",
                                   "X", StringValue ("10.0"),
@@ -340,6 +346,8 @@ mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");
   /* Populate routing table */
   Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
+
+//這裡是ap 接收端
   /* Install TCP Receiver on the access point */
   PacketSinkHelper sinkHelper ("ns3::TcpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), 9));
   ApplicationContainer sinkApp = sinkHelper.Install (apWifiNode);
@@ -351,6 +359,8 @@ mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");
 
 
   /* Install TCP/UDP Transmitter on the station */
+  //這裡是我測量的ue
+
   OnOffHelper server ("ns3::TcpSocketFactory", (InetSocketAddress (apInterface.GetAddress (0), 9)));
   server.SetAttribute ("PacketSize", UintegerValue (payloadSize));
   server.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=1]"));
@@ -359,7 +369,7 @@ mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");
   server.SetAttribute ("MaxBytes", UintegerValue (MaxBytes));
   ApplicationContainer serverApp = server.Install (staWifiNode);
 
-
+//這裡說在其他ue 建立一個應用程式 對ap發送封包
   OnOffHelper otherserver ("ns3::TcpSocketFactory", (InetSocketAddress (apInterface.GetAddress (0), 9)));
   otherserver.SetAttribute ("PacketSize", UintegerValue (payloadSize));
   otherserver.SetAttribute ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=1]"));
@@ -401,6 +411,7 @@ Config::Connect ("/NodeList/*/$ns3::MobilityModel/CourseChange",
   anim.EnableIpv4L3ProtocolCounters (Seconds (0), Seconds (10)); // Optional
   anim.SetMaxPktsPerTraceFile(999999999);
 */
+
   /* Start Simulation */
   Simulator::Stop (Seconds (simulationTime + 1));
   Simulator::Run ();
@@ -428,7 +439,7 @@ main(int argc, char *argv[])
     speed_x=0;
     speed_y=11;
   //有多少 其他人也在使用這個wifiap
-    other_node=2;
+    other_node=200;
   //設定每一個封包多大
     payloadSize = 1024;                       /* Transport layer payload size in bytes. */
   //設定多少個封包 注意封包設定太大會有模擬器跑完卻還沒送完問題所以要再增大模擬器時間
@@ -458,7 +469,8 @@ main(int argc, char *argv[])
 
 //輸出的格式 
 std::cout<<"DataRate(Mbps) AverageThroughput(Mbit/s) Delay(sec) APgetDATA(Bytes) MaxBytes deviation-sec(s) angle(角度夾角) other_node（此ap有多少其他連線）rss(dbm) ue-x方向速度(m/s) ue-y方向速度(m/s)\n";
-
+wifi(argc,argv);
+return 0;
 //底下是我藉由上面參數做的實驗 實驗室 隨機ue速度向量 隨機other_node 隨機rss 隨機datarate 隨機 ap位置所產生的數據
 //亂數
 unsigned seed;
