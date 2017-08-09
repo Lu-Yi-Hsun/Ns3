@@ -4,7 +4,7 @@
 執行安裝
 ```
 sudo sh install-ns3.sh
-``
+```
 
 ## 使用教學
 1.把要執行的程式放入/ns-allinone-3.26/ns-3.26/scratch
