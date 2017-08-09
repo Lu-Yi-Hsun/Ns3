@@ -1,9 +1,19 @@
 # Ns3
 ## 安裝教學
+安裝穩定版本：
+
 下載：https://github.com/Lu-Yi-Hsun/Ns3/tree/master/install/install-ns3.sh
 執行安裝
 ```
 sudo sh install-ns3.sh
+```
+
+安裝即時最新版本(才能使用802.11ax)：
+```
+git clone https://github.com/nsnam/ns-3-dev-git.git
+./waf configure --enable-examples
+./waf
+
 ```
 
 ## 使用教學
