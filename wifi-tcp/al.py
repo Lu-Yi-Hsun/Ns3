@@ -1,5 +1,5 @@
 print("start")
-with open("80211ax.txt") as f:
+with open("bo.txt") as f:
     content = f.read()
 
 ok=content.split("\n")
@@ -35,27 +35,38 @@ print(lost)
 bobo_point=[]
 
 bobo_point_det=[]
+print("！累加數字！")
+print("node \t datarate \t rss \t angle")
 for str in ok:
     ok_co=str.split(" ")
     if ok_co[0].isdigit():
         #算分數
         sub=[]
         score=0
+        print("*******各個參數值********")
+        print(ok_co[7]+"\t"+ok_co[0]+"\t"+ok_co[8]+"\t"+ok_co[6])
+        print("*分數累加*")
         #for node
-        if int(ok_co[7])<20:
-            score=score+11.3
+        if int(ok_co[7])<40:
+            score=score+0.3
         elif int(ok_co[7])>=40 and int(ok_co[7])<=100:
             score=score+0.2
         else:
             score=score+0.1 
+        
+         
+        print(score,end='\t')
         #datarate
         if int(ok_co[0])>=10 and int(ok_co[0])<40:
             score=score+0.1
+             
         elif int(ok_co[0])>=40 and int(ok_co[0])<70:
             score=score+0.2
         elif int(ok_co[0])>=70:
             score=score+0.3
 
+        
+        print(score,end='\t')
         # 10~40m 0.1
         # 40~70m 0.2
         #70~100m 0.3
@@ -71,7 +82,8 @@ for str in ok:
             score=score+0.2
         elif int(ok_co[8])<=-40:
             score=score+0.1 
-        
+         
+        print(score,end='\t')
         ok_co[6]=abs(int(ok_co[6]))
         while ok_co[6]>180:
             ok_co[6]=360-ok_co[6]
@@ -81,9 +93,11 @@ for str in ok:
             score=score+0.2
         elif ok_co[6]<=60 and ok_co[6]>=0:
             score=score+0.3
-        score=int(ok_co[8])
+         
+        print(score,end='\n')
+        #score=int(ok_co[8])
         #delay.append(ok_co[2])
-        print(score)
+        
         sub.append(score)
         sub.append(ok_co[2])
         bobo_point_det.append(sub)
@@ -123,20 +137,20 @@ for i in bobo_point :
     pass
 
 print("伯育演算法平均")
-print (bo_av/33)
+print (bo_av/1)
 
 print("最好平均")
-print(best_av/33)
+print(best_av/1)
 
 print("最差平均")
-print(bad_av/33)
+print(bad_av/1)
 
 print("伯育跟最好誤差")
-print(count/33)
+print(count/1)
 #print("\n")
 
 print("伯育跟最差誤差")
-print(locount/33)
+print(locount/1)
 
 
 
