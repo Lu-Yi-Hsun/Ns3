@@ -1,5 +1,5 @@
 print("start")
-with open("bo.txt") as f:
+with open("80211n.txt") as f:
     content = f.read()
 
 ok=content.split("\n")
@@ -97,7 +97,11 @@ for str in ok:
         print(score,end='\n')
         #score=int(ok_co[8])
         #delay.append(ok_co[2])
-        
+        ######
+        score= -0.00414529*float(ok_co[0])-0.01171041*float(ok_co[8])+0.001444*float(ok_co[6])+0.01757104*float(ok_co[7])
+        score=0-score
+        #score=int(ok_co[7])
+        #score=0-score
         sub.append(score)
         sub.append(ok_co[2])
         bobo_point_det.append(sub)
@@ -127,6 +131,7 @@ locount=0.0
 bo_av=0
 best_av=0
 bad_av=0
+ 
 for i in bobo_point :
     bo_av=float(i)+bo_av
     best_av=best_av+float(best_delay[index])
@@ -137,20 +142,20 @@ for i in bobo_point :
     pass
 
 print("伯育演算法平均")
-print (bo_av/1)
+print (bo_av/len(bobo_point))
 
 print("最好平均")
-print(best_av/1)
+print(best_av/len(bobo_point))
 
 print("最差平均")
-print(bad_av/1)
+print(bad_av/len(bobo_point))
 
 print("伯育跟最好誤差")
-print(count/1)
+print(count/len(bobo_point))
 #print("\n")
 
 print("伯育跟最差誤差")
-print(locount/1)
+print(locount/len(bobo_point))
 
 
 
