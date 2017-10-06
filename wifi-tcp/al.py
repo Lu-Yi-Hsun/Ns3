@@ -1,5 +1,5 @@
 print("start")
-with open("80211n.txt") as f:
+with open("80211ax.txt") as f:
     content = f.read()
 
 ok=content.split("\n")
@@ -98,8 +98,9 @@ for str in ok:
         #score=int(ok_co[8])
         #delay.append(ok_co[2])
         ######
-        score= -0.00414529*float(ok_co[0])-0.01171041*float(ok_co[8])+0.001444*float(ok_co[6])+0.01757104*float(ok_co[7])
-        score=0-score
+        #score= -0.00414529*float(ok_co[0])-0.01171041*float(ok_co[8])+0.001444*float(ok_co[6])+0.01757104*float(ok_co[7])
+        score=int(ok_co[8])
+         
         #score=int(ok_co[7])
         #score=0-score
         sub.append(score)

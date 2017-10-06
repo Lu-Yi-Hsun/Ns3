@@ -15,7 +15,7 @@ x_t1=[]
 x_t2=[]
 x_t3=[]
 x_t4=[]
-with open("n_noother") as f:
+with open("80211n.txt") as f:
     
     content = f.read()
 
@@ -31,7 +31,7 @@ for i in content_ok:
    # xt.append(1)
     xt.append(float(ok[0]))
     xt.append(float(ok[8]))
-    #xt.append(float(ok[7]))
+    xt.append(float(ok[7]))
     ok[6]=abs(float(ok[6]))
     while ok[6]>180:
         ok[6]=360-ok[6]
